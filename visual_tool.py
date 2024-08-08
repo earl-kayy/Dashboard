@@ -3,7 +3,9 @@ import streamlit as st
 import plotly.graph_objects as go
 import json
 import altair as alt
+import seaborn as sns
 import pandas as pd
+import matplotlib.pyplot as plt
 
 class VisualTool:
 
@@ -20,6 +22,7 @@ class VisualTool:
         chart = c1 + c2
         st.altair_chart(chart, theme = 'streamlit', use_container_width=True)
 
+    # 선택한 항목 하이라이트하기 위해
     @staticmethod
     def plot_cat_dist(category_distribution, search_queries):
         
@@ -44,6 +47,7 @@ class VisualTool:
         fig.update_traces(marker_color = colors)
         st.plotly_chart(fig)
     
+    # 선택한 항목만 볼 수 시각화
     @staticmethod
     def plot_cat_partial(category_distribution, categories):
         temp_df = category_distribution.loc[category_distribution['label'].isin(categories)]
@@ -65,7 +69,6 @@ class VisualTool:
             labels = detail_distribution['label']
             values = detail_distribution['count']
             
-            # 세련되고 중립적인 색상 팔레트
             colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880']
             
             # 파이 차트 생성
@@ -86,7 +89,7 @@ class VisualTool:
                 paper_bgcolor='#FFFFFF',  # 밝은 배경색
                 plot_bgcolor='#FFFFFF',  # 밝은 배경색
                 font=dict(color='#000000'),
-                margin=dict(t=30, b=0, l=0, r=0)
+                margin=dict(t=0, b=0, l=0, r=0)
             )
 
             # 애니메이션 효과 추가
@@ -207,7 +210,7 @@ class VisualTool:
             ),
             plot_bgcolor='rgba(0,0,0,0)',  # 배경 투명하게 설정
             paper_bgcolor='rgba(0,0,0,0)',  # 배경 투명하게 설정
-            margin=dict(l=40, r=40, t=50, b=40)  # 마진 조정
+            margin=dict(l=10, r=10, t=30, b=0)  # 마진 조정
         )
 
         # 마커 라인 스타일 수정
@@ -216,4 +219,42 @@ class VisualTool:
             marker=dict(line=dict(width=0.5, color='DarkSlateGrey'))
         )
         
+        st.plotly_chart(fig)
+
+    @staticmethod
+    def plot_duration_line(duration_df):
+        fig = go.Figure()
+
+        # 히스토그램
+        fig.add_trace(go.Histogram(
+            x=duration_df['duration'],
+            nbinsx=100,
+            name='Histogram',
+            marker=dict(color='blue', line=dict(color='black', width=1)),
+            opacity=0.7
+        ))
+
+        # 라인 플롯
+        line_data = duration_df['duration'].value_counts().sort_index()
+        fig.add_trace(go.Scatter(
+            x=line_data.index,
+            y=line_data.values,
+            mode='lines+markers',
+            name='Line Plot',
+            line=dict(color='red')
+        ))
+
+        # 레이아웃 설정
+        fig.update_layout(
+            title='Histogram and Line Plot of Duration',
+            xaxis_title='Duration',
+            yaxis_title='Frequency',
+            yaxis2=dict(
+                title='Duration',
+                overlaying='y',
+                side='right'
+            ),
+            legend=dict(x=0.1, y=0.9)
+        )
+
         st.plotly_chart(fig)

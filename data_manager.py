@@ -17,7 +17,10 @@ class DataManager:
         ### 추가하는 부분 (main component) 넣는 부분.
         self.__main_components = self.__set_main_components()
         
-        # sub 카테고리로 분류된 데이터 프레임
+        # 각 category 에 대한 설명을 담고 있는 데이터 프레임
+        self.__category_explanations = self.__set_category_explanations()
+
+        # category 로 분류된 데이터 프레임
         self.__category_distribution = self.__set_category_distribution()
 
         # 하위 카테고리를 갖는 상위 카테고리명 관리 (수정 필요)
@@ -52,6 +55,10 @@ class DataManager:
     @st.cache_data(persist = 'disk')
     def __set_main_components(__self):
         return __self.__data_df.groupby('main')['category'].apply(lambda x: x.unique())
+    
+    # category 별 설명을 담는 데이터 프레임
+    def __set_category_explanations(self):
+        return pd.read_csv('./data/cat_explanation.csv')
     
     # 주 카테고리의 분포 업데이트(새로운 데이터 들어왔을 때)
     @st.cache_data(persist = 'disk')
@@ -93,6 +100,13 @@ class DataManager:
     # kor/english 의 내부 sub 카테고리들
     def get_main_components(self, main_category):
         return self.__main_components[main_category].tolist()
+    
+    # category 별 설명을 가진 데이터 프레임 가져옴
+    def get_category_explanations(self, category):
+        explanation = self.__category_explanations[self.__category_explanations['category'].str.lower() == category]['explanation']
+        if explanation.empty:
+            return None
+        return explanation.iloc[0]
     
     def get_category_distribution(self):
         return self.__category_distribution
@@ -154,11 +168,12 @@ class DataManager:
         
     # 전체에 대한 histogram 그릴때는 필요없음.
     def count_entries_durationwise(self, main=None, category=None):
-        if main == None:
+        if main == None and category == None:
             temp = self.__data_df['duration'].to_frame()
             return temp
-        elif category == None:
-            pass
+        elif category != None:
+            temp = self.__data_df[self.__data_df['category'] == category]['duration'].to_frame()
+            return temp
         else:
             pass
         
