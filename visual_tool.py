@@ -3,9 +3,6 @@ import streamlit as st
 import plotly.graph_objects as go
 import json
 import altair as alt
-import seaborn as sns
-import pandas as pd
-import matplotlib.pyplot as plt
 
 class VisualTool:
 
