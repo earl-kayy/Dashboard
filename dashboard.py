@@ -185,6 +185,7 @@ if option == 'Data Navigator':
                 selected_categories = st.multiselect(
                     'Select Categories (max 2):',
                     categories,
+                    default = ['KforeignSpeech'],
                     help = 'You can select up to 2 options'
                 )
 
